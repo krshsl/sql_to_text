@@ -61,7 +61,7 @@ Icon
 *.env
 !prod.env
 
-# Output Dataset
+# Output folder
 out/
 
 # Logs
