@@ -19,6 +19,7 @@ class PAYLOADS(Enum):
 
 class LLMS:
     payload = {
+        "max_tokens": 4000,
         "top_p": 1,
         "top_k": 40,
         "presence_penalty": 0,
@@ -32,10 +33,10 @@ class LLMS:
     def init_payload(self, payload):
         if payload == PAYLOADS.LLAMA_8B:
             self.payload["model"] = "accounts/fireworks/models/llama-v3p1-8b-instruct"
-            self.payload["max_tokens"] = 16384
+            # self.payload["max_tokens"] = 16384
         elif payload == PAYLOADS.FINE_TUNE_8B:
             self.payload["model"] = "accounts/ks2025-c3e5c8/models/al1"
-            self.payload["max_tokens"] = 4000
+            # self.payload["max_tokens"] = 4000
         else:
             exit("Invalid payload")
 
