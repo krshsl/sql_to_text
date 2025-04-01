@@ -36,7 +36,6 @@ class LLMS:
             # self.payload["max_tokens"] = 16384
         elif payload == PAYLOADS.FINE_TUNE_8B:
             self.payload["model"] = "accounts/ks2025-c3e5c8/models/al1"
-            # self.payload["max_tokens"] = 4000
         else:
             exit("Invalid payload")
 

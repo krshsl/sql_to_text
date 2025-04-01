@@ -113,7 +113,7 @@ class SAMPLING:
                 if not os.path.exists(f"../out/{self.payload}"):
                     os.makedirs(f"../out/{self.payload}")
 
-                plt.imsave(f"../out/{self.payload}/output_{i}.png")
+                plt.savefig(f"../out/{self.payload}/output_{i}.png")
 
             plt.tight_layout()
             plt.show()
