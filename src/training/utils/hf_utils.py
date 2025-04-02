@@ -5,7 +5,6 @@ rouge = Rouge()
 
 def grpo_reward(prompts, completions, ground_truth, **kwargs):
     rewards = []
-    
     for prompt, completion, truth in zip(prompts, completions, ground_truth):
         try:
             scores = rouge.get_scores(completion, truth)[0]
@@ -15,4 +14,7 @@ def grpo_reward(prompts, completions, ground_truth, **kwargs):
         
         rewards.append(reward)
     
+    while len(rewards) != 8:
+        rewards.append(0.0)
+
     return np.array(rewards)
