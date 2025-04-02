@@ -33,8 +33,8 @@ git update-index --no-assume-unchanged prod.env
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/sql-to-text.git
-cd sql-to-text
+git clone https://github.com/krshsl/sql_to_text.git
+cd sql_to_text
 
 # Install dependencies
 python3 -m venv .venv
