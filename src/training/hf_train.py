@@ -1,3 +1,6 @@
+'''
+author: @krshsl
+'''
 from data import DATASET, sft_formatter
 from .utils import grpo_reward
 from trl import SFTConfig, SFTTrainer, setup_chat_format

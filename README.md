@@ -41,3 +41,8 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
+### Collaborators
+[Christopher Flores](https://github.com/florescss14)  
+[William Huang](https://github.com/willhuang2017)  
+[Krishna Sathyamurthy](https://github.com/krshsl)  

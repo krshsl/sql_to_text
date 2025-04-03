@@ -1,5 +1,5 @@
 '''
-author: chris, williams
+author: @florescss14, @willhuang2017
 '''
 from enum import Enum
 import requests

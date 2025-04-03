@@ -1,3 +1,6 @@
+'''
+author: @krshsl
+'''
 from enum import Enum
 
 class HF_PAYLOADS(Enum):

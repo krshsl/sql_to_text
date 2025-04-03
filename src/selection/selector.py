@@ -1,5 +1,5 @@
 '''
-author: Krishna
+author: @krshsl
 '''
 from llms import LLMS, PAYLOADS
 from random import random

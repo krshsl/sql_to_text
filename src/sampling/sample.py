@@ -1,5 +1,5 @@
 '''
-author: williams
+author: @willhuang2017
 '''
 from training import BRKDWN_RESPONSE_GEN, BRKDWN_QUES_GEN, SAMPLING_GENERATOR
 from sentence_transformers import SentenceTransformer
