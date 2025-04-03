@@ -1,7 +1,7 @@
 '''
 author: williams
 '''
-from training import BREAKDOWN_R_MODEL, BREAKDOWN_Q_MODEL, SAMPLING_MODEL
+from training import BRKDWN_RESPONSE_GEN, BRKDWN_QUES_GEN, SAMPLING_GENERATOR
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.pyplot as plt
@@ -11,9 +11,9 @@ import os
 
 class SAMPLING:
     def __init__(self, payload, train, noQueries):
-        self.br_model = BREAKDOWN_R_MODEL(payload, train)
-        self.bq_model = BREAKDOWN_Q_MODEL(payload, train)
-        self.s_model = SAMPLING_MODEL(payload, train)
+        self.br_model = BRKDWN_RESPONSE_GEN(payload, train)
+        self.bq_model = BRKDWN_QUES_GEN(payload, train)
+        self.s_model = SAMPLING_GENERATOR(payload, train)
         self.payload = payload
         self.noQueries = noQueries
         self.sbertModel = SentenceTransformer('all-MiniLM-L6-v2')

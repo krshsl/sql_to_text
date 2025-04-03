@@ -12,17 +12,17 @@ class MODEL_TYPE(Enum):
 
 def get_model(model_type, payload, train):
     if model_type == MODEL_TYPE.ZERO_SHOT:
-        return ZERO_SHOT_MODEL(payload, train)
+        return ZERO_SHOT_GENERATOR(payload, train)
     elif model_type == MODEL_TYPE.BREAKDOWN_R:
-        return BREAKDOWN_R_MODEL(payload, train)
+        return BRKDWN_RESPONSE_GEN(payload, train)
     elif model_type == MODEL_TYPE.BREAKDOWN_Q:
-        return BREAKDOWN_Q_MODEL(payload, train)
+        return BRKDWN_QUES_GEN(payload, train)
     elif model_type == MODEL_TYPE.SAMPLING:
-        return SAMPLING_MODEL(payload, train)
+        return SAMPLING_GENERATOR(payload, train)
     else:
         exit("Invalid model type")
 
-class MODEL:
+class GENERATOR:
     Q_TYPE = "Query"
 
     def __init__(self, payload, train):
@@ -53,29 +53,33 @@ class MODEL:
         return responses
 
 
-class ZERO_SHOT_MODEL(MODEL):
+class ZERO_SHOT_GENERATOR(GENERATOR):
     def __init__(self, payload, train):
         super().__init__(payload, train)
         self.request = """Convert the following SQL query into a natural language question. Your soresponse must be a single sentence in the form of a clear and concise question."""
 
 
-class BREAKDOWN_MODELS(MODEL):
+class BREAKDOWN_GENERATORS(GENERATOR):
     def __init__(self, payload, train):
         super().__init__(payload, train)
-        self.init_breakdowns()
 
-    def init_breakdowns(self):
+    def get_breakdowns(self):
         breakdown1 = """Tables Involved: Trip (aliased as T1), Weather (aliased as T2)\nSELECT T1.id: Retrieves the id column from the table T1 (Trip)\nFROM Trip AS T1: Selecting data from the Trip Table, which is aliased as T1\nINNER JOIN weather AS T2 ON T2.zip_code = T1.zip_code: Performs an inner join between the Trip table (T1) and Weather Table, which is aliased as T2, matching rows where the zip_code from both tables are equal\nWHERE T2.min_temperature_f < 45: Filters the rows, keeping only those where the minimum temperature value in the Weather Table (T2) is less than 45"""
         breakdown2 = """Tables Involved: Employee (aliased as T1), Inspection (aliased as T2)\nSELECT CAST(COUNT(DISTINCT T2.inspection_id) AS REAL) / 5: Calculates the distinct count of inspection IDs from the Inspection Table (T2), casts it to REAL, and divides it by 5\nSELECT T1.first_name, T1.last_name: Retrieves the first name and last name columns from the Employee Table (T1)\nFROM Employee AS T1: Selecting data from the Employee Table, which is aliased as T1\nINNER JOIN inspection AS T2 ON T1.employee_id = T2.employee_id: Performs an inner join between the Employee table (T1) and Inspection Table, which is aliased as T2 matching rows where the employee_id from both tables are equal\nWHERE T1.title = 'Sanitarian': Filters the rows to include only those where the title of the employee in the Employee Table (T1) is 'Sanitarian'\nORDER BY T1.salary DESC: Orders the rows by salary in descending order from the Employee Table (T1)\nLIMIT 5: Limits the results to only the first 5 rows based on the salary ordering"""
         breakdown3 = """Tables Involved: Paper (aliased as T1), PaperAuthor (aliased as T2)\nSELECT COUNT(DISTINCT T2.Name): Counts the distinct number of author names from the PaperAuthor Table (T2)\nFROM Paper AS T1: Selecting data from the Paper Table, which is aliased as T1\nINNER JOIN PaperAuthor AS T2 ON T1.Id = T2.PaperId: Performs an inner join between the Paper table (T1) and PaperAuthor Table, which is aliased as T2, matching rows where the PaperId from PaperAuthor Table (T2) is equal to the Id from Paper Table (T1)\nWHERE T1.Title = 'Subcellular localization of nuclease in barley aleurone': Filters the rows to include only those where the title of the paper in the Paper Table (T1) is 'Subcellular localization of nuclease in barley aleurone'"""
-        self.breakdowns = [breakdown1, breakdown2, breakdown3]
+        return [breakdown1, breakdown2, breakdown3]
 
+    def get_queries(self):
+        query1 = """SELECT T1.id FROM trip AS T1 INNER JOIN weather AS T2 ON T2.zip_code = T1.zip_code WHERE T2.min_temperature_f < 45"""
+        query2 = """SELECT CAST(COUNT(DISTINCT T2.inspection_id) AS REAL) \/ 5, T1.first_name, T1.last_name FROM employee AS T1 INNER JOIN inspection AS T2 ON T1.employee_id = T2.employee_id WHERE T1.title = 'Sanitarian' ORDER BY T1.salary DESC LIMIT 5"""
+        query3 = """SELECT COUNT(DISTINCT T2.Name) FROM Paper AS T1 INNER JOIN PaperAuthor AS T2 ON T1.Id = T2.PaperId WHERE T1.Title = 'Subcellular localization of nuclease in barley aleurone'"""
+        return [query1, query2, query3]
 
-class BREAKDOWN_R_MODEL(BREAKDOWN_MODELS):
+class BRKDWN_RESPONSE_GEN(BREAKDOWN_GENERATORS):
     def __init__(self, payload, train):
         super().__init__(payload, train)
         examples = "\n".join(
-            [f"\nSQL Query: {query}\nBreakdown: {breakdown}" for query, breakdown in zip(train['query'][0:3], self.breakdowns)]
+            [f"\nSQL Query: {query}\nBreakdown: {breakdown}" for query, breakdown in zip(self.get_queries(), self.get_breakdowns())]
         )
 
         self.request = f"""Break down the following SQL query into its in a human-readable format? Please follow the EXACT breakdown format of the listed examples.
@@ -84,13 +88,13 @@ class BREAKDOWN_R_MODEL(BREAKDOWN_MODELS):
                 \nNow, breakdown the following SQL query:
                 """
 
-class BREAKDOWN_Q_MODEL(BREAKDOWN_MODELS):
+class BRKDWN_QUES_GEN(BREAKDOWN_GENERATORS):
     Q_TYPE = "Breakdown"
 
     def __init__(self, payload, train):
         super().__init__(payload, train)
         examples = "\n".join(
-            [f"\nBreakdown: {breakdown}\nQuestion: {question}" for breakdown, question in zip(self.breakdowns, train['question'][0:3])]
+            [f"\nBreakdown: {breakdown}\nQuestion: {question}" for breakdown, question in zip(self.get_queries(), self.get_breakdowns())]
         )
 
         self.request = f"""Convert the following individual steps into a natural language question. Your response must be a single sentence in the form of a clear and concise question that a human with no knowledge of SQL would ask.
@@ -100,7 +104,7 @@ class BREAKDOWN_Q_MODEL(BREAKDOWN_MODELS):
                 """
 
 
-class SAMPLING_MODEL(MODEL):
+class SAMPLING_GENERATOR(GENERATOR):
     def __init__(self, payload, train):
         super().__init__(payload, train)
         self.examples = "\n".join(
