@@ -112,7 +112,7 @@ transformers==4.50.3
 trl==0.16.0
 typing_extensions==4.13.0
 tzdata==2025.2
-urllib3==2.3.0
+urllib3==2.5.0
 wcwidth==0.2.13
 Werkzeug==3.1.3
 widgetsnbextension==4.0.13
